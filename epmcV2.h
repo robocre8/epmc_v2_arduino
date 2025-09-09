@@ -9,35 +9,37 @@ class EPMC_V2
 public:
   EPMC_V2(int);
 
-  bool writeSpeed(int, float);
-
-  bool writePWM(int, int);
-
-  float readPos(int);
-
-  float readVel(int);
-
-  float readUVel(int);
-
-  bool setCmdTimeout(int);
-
+  int writeSpeed(float v0, float v1, float v2, float v3);
+  int writePWM(int pwm0, int pwm1, int pwm2, int pwm3);
+  void readPos(float &pos0, float &pos1, float &pos2, float &pos3);
+  void readVel(float &v0, float &v1, float &v2, float &v3);
+  void readUVel(float &v0, float &v1, float &v2, float &v3);
+  int setCmdTimeout(int timeout_ms);
   int getCmdTimeout();
-
-  bool setPidMode(int, int);
-
-  int getPidMode(int);
+  int setPidMode(int motor_no, int mode);
+  int getPidMode(int motor_no);
 
 
 private:
   int slaveAddr;
+  void send_packet(uint8_t cmd);
+  void send_packet_stream(uint8_t cmd, uint8_t pos, float val);
+  void send_packet_stream(uint8_t cmd, float val0, float val1, float val2, float val3);
+  float read_packet();
+  void read_packet_stream(float &val0, float &val1, float &val2, float &val3);
 
-  float get(String, int);
-
-  bool send(String, int, float);
-
-  void masterSendData(String);
-
-  String masterReceiveData();
+  //  Protocol Command IDs -------------
+  const uint8_t START_BYTE = 0xAA;
+  const uint8_t WRITE_VEL = 0x01;
+  const uint8_t WRITE_PWM = 0x02;
+  const uint8_t READ_POS = 0x03;
+  const uint8_t READ_VEL = 0x04;
+  const uint8_t READ_UVEL = 0x05;
+  const uint8_t SET_PID_MODE = 0x15;
+  const uint8_t GET_PID_MODE = 0x16;
+  const uint8_t SET_CMD_TIMEOUT = 0x17;
+  const uint8_t GET_CMD_TIMEOUT = 0x18;
+  //---------------------------------------------
 };
 
 #endif
