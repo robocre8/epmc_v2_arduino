@@ -131,6 +131,31 @@ void EPMC_V2::read_data4(float &val0, float &val1, float &val2, float &val3)
   memcpy(&val3, &buffer[12], sizeof(float));
 }
 
+void EPMC_V2::read_data8(float &val0, float &val1, float &val2, float &val3, float &val4, float &val5, float &val6, float &val7)
+{
+  uint8_t buffer[32];
+  uint8_t dataSizeInBytes = Wire.requestFrom(slaveAddr, 32);
+  for (size_t i = 0; i < dataSizeInBytes; i += 1)
+  {
+    uint8_t data = Wire.read();
+    buffer[i] = data;
+  }
+  memcpy(&val0, &buffer[0], sizeof(float));
+  memcpy(&val1, &buffer[4], sizeof(float));
+  memcpy(&val2, &buffer[8], sizeof(float));
+  memcpy(&val3, &buffer[12], sizeof(float));
+  memcpy(&val4, &buffer[16], sizeof(float));
+  memcpy(&val5, &buffer[20], sizeof(float));
+  memcpy(&val6, &buffer[24], sizeof(float));
+  memcpy(&val7, &buffer[28], sizeof(float));
+}
+
+void EPMC_V2::readMotorData(float &pos0, float &pos1, float &pos2, float &pos3, float &v0, float &v1, float &v2, float &v3){
+  send_packet_without_payload(READ_MOTOR_DATA);
+  read_data8(pos0, pos1, pos2, pos3, v0, v1, v2, v3);
+  read_data8(pos0, pos1, pos2, pos3, v0, v1, v2, v3);
+}
+
 
 int EPMC_V2::writeSpeed(float v0, float v1, float v2, float v3){
   float res;

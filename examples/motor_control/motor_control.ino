@@ -97,8 +97,10 @@ void loop()
 
     // left wheels (motor 0 and motor 2)
     // left wheels (motor 1 and motor 3)
-    epmcV2.readPos(pos0, pos1, pos2, pos3);
-    epmcV2.readVel(v0, v1, v2, v3);
+    // epmcV2.readPos(pos0, pos1, pos2, pos3);
+    // epmcV2.readVel(v0, v1, v2, v3);
+
+    epmcV2.readMotorData(pos0, pos1, pos2, pos3, v0, v1, v2, v3);
 
     // Print results
     Serial.println("-----------------------------------");

@@ -18,6 +18,7 @@ public:
   int getCmdTimeout();
   int setPidMode(int motor_no, int mode);
   int getPidMode(int motor_no);
+  void readMotorData(float &pos0, float &pos1, float &pos2, float &pos3, float &v0, float &v1, float &v2, float &v3);
 
 
 private:
@@ -29,6 +30,7 @@ private:
   float read_data1();
   void read_data3(float &val0, float &val1, float &val2);
   void read_data4(float &val0, float &val1, float &val2, float &val3);
+  void read_data8(float &val0, float &val1, float &val2, float &val3, float &val4, float &val5, float &val6, float &val7);
 
   //  Protocol Command IDs -------------
   const uint8_t START_BYTE = 0xAA;
@@ -41,6 +43,7 @@ private:
   const uint8_t GET_PID_MODE = 0x16;
   const uint8_t SET_CMD_TIMEOUT = 0x17;
   const uint8_t GET_CMD_TIMEOUT = 0x18;
+  const uint8_t READ_MOTOR_DATA = 0x2A;
   //---------------------------------------------
 };
 
