@@ -22,11 +22,13 @@ public:
 
 private:
   int slaveAddr;
-  void send_packet(uint8_t cmd);
-  void send_packet_stream(uint8_t cmd, uint8_t pos, float val);
-  void send_packet_stream(uint8_t cmd, float val0, float val1, float val2, float val3);
-  float read_packet();
-  void read_packet_stream(float &val0, float &val1, float &val2, float &val3);
+  void send_packet_without_payload(uint8_t cmd);
+  void write_data1(uint8_t cmd, uint8_t pos, float val);
+  void write_data3(uint8_t cmd, float val0, float val1, float val2);
+  void write_data4(uint8_t cmd, float val0, float val1, float val2, float val3);
+  float read_data1();
+  void read_data3(float &val0, float &val1, float &val2);
+  void read_data4(float &val0, float &val1, float &val2, float &val3);
 
   //  Protocol Command IDs -------------
   const uint8_t START_BYTE = 0xAA;

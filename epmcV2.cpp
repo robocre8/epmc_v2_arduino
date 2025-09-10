@@ -13,15 +13,7 @@ uint8_t computeChecksum(uint8_t *packet, uint8_t length) {
   return sum & 0xFF; 
 }
 
-// uint8_t computeChecksum(uint8_t *packet[20]) {
-//   uint32_t sum = 0;
-//   for (size_t i=0; i<8; i+=1) {
-//     sum += &packet[i];
-//   }
-//   return sum & 0xFF;
-// }
-
-void EPMC_V2::send_packet(uint8_t cmd)
+void EPMC_V2::send_packet_without_payload(uint8_t cmd)
 {
   // Build packet: start_byte + cmd + length + pos + float + checksum
   uint8_t packet[4];
@@ -38,7 +30,7 @@ void EPMC_V2::send_packet(uint8_t cmd)
   Wire.endTransmission(true);
 }
 
-void EPMC_V2::send_packet_stream(uint8_t cmd, uint8_t pos, float val)
+void EPMC_V2::write_data1(uint8_t cmd, uint8_t pos, float val)
 {
   // Build packet: start_byte + cmd + length + pos + float + checksum
   uint8_t packet[1 + 1 + 1 + 1 + 4 + 1];
@@ -57,7 +49,26 @@ void EPMC_V2::send_packet_stream(uint8_t cmd, uint8_t pos, float val)
   Wire.endTransmission(true);
 }
 
-void EPMC_V2::send_packet_stream(uint8_t cmd, float val0, float val1, float val2, float val3)
+void EPMC_V2::write_data3(uint8_t cmd, float val0, float val1, float val2)
+{
+  // Build packet: start_byte + cmd + length + float*3 + checksum
+  uint8_t packet[1 + 1 + 1 + 12 + 1];
+  packet[0] = START_BYTE;
+  packet[1] = cmd;
+  packet[2] = 12; // msg is 3 float = 12byte length
+  memcpy(&packet[3], &val0, sizeof(float));
+  memcpy(&packet[7], &val1, sizeof(float));
+  memcpy(&packet[11], &val2, sizeof(float));
+  // Compute checksum
+  uint8_t checksum = computeChecksum(packet, 15);
+  packet[15] = checksum;
+
+  Wire.beginTransmission(slaveAddr);
+  Wire.write(packet, sizeof(packet));
+  Wire.endTransmission(true);
+}
+
+void EPMC_V2::write_data4(uint8_t cmd, float val0, float val1, float val2, float val3)
 {
   // Build packet: start_byte + cmd + length + float*4 + checksum
   uint8_t packet[1 + 1 + 1 + 16 + 1];
@@ -77,7 +88,7 @@ void EPMC_V2::send_packet_stream(uint8_t cmd, float val0, float val1, float val2
   Wire.endTransmission(true);
 }
 
-float EPMC_V2::read_packet()
+float EPMC_V2::read_data1()
 {
   uint8_t buffer[4];
   float res;
@@ -91,7 +102,21 @@ float EPMC_V2::read_packet()
   return res;
 }
 
-void EPMC_V2::read_packet_stream(float &val0, float &val1, float &val2, float &val3)
+void EPMC_V2::read_data3(float &val0, float &val1, float &val2)
+{
+  uint8_t buffer[12];
+  uint8_t dataSizeInBytes = Wire.requestFrom(slaveAddr, 12);
+  for (size_t i = 0; i < dataSizeInBytes; i += 1)
+  {
+    uint8_t data = Wire.read();
+    buffer[i] = data;
+  }
+  memcpy(&val0, &buffer[0], sizeof(float));
+  memcpy(&val1, &buffer[4], sizeof(float));
+  memcpy(&val2, &buffer[8], sizeof(float));
+}
+
+void EPMC_V2::read_data4(float &val0, float &val1, float &val2, float &val3)
 {
   uint8_t buffer[16];
   uint8_t dataSizeInBytes = Wire.requestFrom(slaveAddr, 16);
@@ -109,58 +134,58 @@ void EPMC_V2::read_packet_stream(float &val0, float &val1, float &val2, float &v
 
 int EPMC_V2::writeSpeed(float v0, float v1, float v2, float v3){
   float res;
-  send_packet_stream(WRITE_VEL, v0, v1, v2, v3);
-  res = read_packet();
-  res = read_packet();
+  write_data4(WRITE_VEL, v0, v1, v2, v3);
+  res = read_data1();
+  res = read_data1();
   return (int)res;
 }
 int EPMC_V2::writePWM(int pwm0, int pwm1, int pwm2, int pwm3){
   float res;
-  send_packet_stream(WRITE_VEL, (float)pwm0, (float)pwm1, (float)pwm2, (float)pwm3);
-  res = read_packet();
-  res = read_packet();
+  write_data4(WRITE_VEL, (float)pwm0, (float)pwm1, (float)pwm2, (float)pwm3);
+  res = read_data1();
+  res = read_data1();
   return (int)res;
 }
 void EPMC_V2::readPos(float &pos0, float &pos1, float &pos2, float &pos3){
-  send_packet(READ_POS);
-  read_packet_stream(pos0, pos1, pos2, pos3);
-  read_packet_stream(pos0, pos1, pos2, pos3);
+  send_packet_without_payload(READ_POS);
+  read_data4(pos0, pos1, pos2, pos3);
+  read_data4(pos0, pos1, pos2, pos3);
 }
 void EPMC_V2::readVel(float &v0, float &v1, float &v2, float &v3){
-  send_packet(READ_VEL);
-  read_packet_stream(v0, v1, v2, v3);
-  read_packet_stream(v0, v1, v2, v3);
+  send_packet_without_payload(READ_VEL);
+  read_data4(v0, v1, v2, v3);
+  read_data4(v0, v1, v2, v3);
 }
 void EPMC_V2::readUVel(float &v0, float &v1, float &v2, float &v3){
-  send_packet(READ_UVEL);
-  read_packet_stream(v0, v1, v2, v3);
-  read_packet_stream(v0, v1, v2, v3);
+  send_packet_without_payload(READ_UVEL);
+  read_data4(v0, v1, v2, v3);
+  read_data4(v0, v1, v2, v3);
 }
 int EPMC_V2::setCmdTimeout(int timeout_ms){
   float res;
-  send_packet_stream(SET_CMD_TIMEOUT, 0, (float)timeout_ms);
-  res = read_packet();
-  res = read_packet();
+  write_data1(SET_CMD_TIMEOUT, 0, (float)timeout_ms);
+  res = read_data1();
+  res = read_data1();
   return (int)res;
 }
 int EPMC_V2::getCmdTimeout(){
   float res;
-  send_packet_stream(GET_CMD_TIMEOUT, 0, 0.0);
-  res = read_packet();
-  res = read_packet();
+  write_data1(GET_CMD_TIMEOUT, 0, 0.0);
+  res = read_data1();
+  res = read_data1();
   return (int)res;
 }
 int EPMC_V2::setPidMode(int motor_no, int mode){
   float res;
-  send_packet_stream(SET_PID_MODE, motor_no, (float)mode);
-  res = read_packet();
-  res = read_packet();
+  write_data1(SET_PID_MODE, motor_no, (float)mode);
+  res = read_data1();
+  res = read_data1();
   return (int)res;
 }
 int EPMC_V2::getPidMode(int motor_no){
   float res;
-  send_packet_stream(GET_PID_MODE, motor_no, 0.0);
-  res = read_packet();
-  res = read_packet();
+  write_data1(GET_PID_MODE, motor_no, 0.0);
+  res = read_data1();
+  res = read_data1();
   return (int)res;
 }
