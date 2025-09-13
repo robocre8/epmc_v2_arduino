@@ -26,16 +26,16 @@ void delayMs(int ms)
 }
 //////////////////////////////////////////////////
 
-bool isSuccessful;
-float angPos0, angPos1, angPos2, angPos3; // (in rad)
-float angVel0, angVel1, angVel2, angVel3; // (in rad/sec)
+int isSuccessful;
+float pos0, pos1, pos2, pos3; // (in rad)
+float v0, v1, v2, v3; // (in rad/sec)
 
-float lowTargetVel = 0.00;  // rad/sec
+float lowTargetVel = -1.57;  // rad/sec
 float highTargetVel = 1.57; // rad/sec
 bool sendHigh = true;
 
 long prevTime;
-long sampleTime = 100; // millisec
+long sampleTime = 20; // millisec
 
 long ctrlPrevTime;
 long ctrlSampleTime = 4000; // millisec
@@ -48,29 +48,17 @@ void setup()
   // setup serial communication to print result on serial minitor
   Serial.begin(115200);
 
-  delay(2000);
+  delay(4000);
 
   // left wheels (motor 0 and motor 2)
-  epmcV2.writeSpeed(0, 0.00);
-  epmcV2.writeSpeed(2, 0.00);
-
   // right wheels (motor 1 and motor 3)
-  epmcV2.writeSpeed(1, 0.00);
-  epmcV2.writeSpeed(3, 0.00);
+  epmcV2.writeSpeed(0.0, 0.0, 0.0, 0.0);
 
-  // int cmd_vel_timeout = 2000; // 0 to deactivate.
-  // epmcV2.setCmdTimeout(cmd_vel_timeout); // set motor command velocity timeout
-  // cmd_vel_timeout = epmcV2.getCmdTimeout(cmd_vel_timeout); // get the stored command velocity timeout
-  // Serial.print("motor command vel timeout in ms: ");
-  // Serial.println(cmd_vel_timeout);
-
-  // left wheels (motor 0 and motor 2)
-  epmcV2.writeSpeed(0, lowTargetVel);
-  epmcV2.writeSpeed(2, lowTargetVel);
-
-  // right wheels (motor 1 and motor 3)
-  epmcV2.writeSpeed(1, lowTargetVel);
-  epmcV2.writeSpeed(3, lowTargetVel);
+  int cmd_vel_timeout = 6000; // 0 to deactivate.
+  epmcV2.setCmdTimeout(cmd_vel_timeout); // set motor command velocity timeout
+  cmd_vel_timeout = epmcV2.getCmdTimeout(); // get the stored command velocity timeout
+  Serial.print("motor command vel timeout in ms: ");
+  Serial.println(cmd_vel_timeout);
 
   sendHigh = true;
 
@@ -85,25 +73,19 @@ void loop()
     if (sendHigh)
     {
       // left wheels (motor 0 and motor 2)
-      epmcV2.writeSpeed(0, highTargetVel);
-      epmcV2.writeSpeed(2, highTargetVel);
-
       // right wheels (motor 1 and motor 3)
-      epmcV2.writeSpeed(1, highTargetVel);
-      epmcV2.writeSpeed(3, highTargetVel);
-
+      isSuccessful = epmcV2.writeSpeed(highTargetVel, highTargetVel, highTargetVel, highTargetVel);
+      Serial.println(isSuccessful);
+      isSuccessful = 0;
       sendHigh = false;
     }
     else
     {
       // left wheels (motor 0 and motor 2)
-      epmcV2.writeSpeed(0, lowTargetVel);
-      epmcV2.writeSpeed(2, lowTargetVel);
-
       // right wheels (motor 1 and motor 3)
-      epmcV2.writeSpeed(1, lowTargetVel);
-      epmcV2.writeSpeed(3, lowTargetVel);
-
+      isSuccessful = epmcV2.writeSpeed(lowTargetVel, lowTargetVel, lowTargetVel, lowTargetVel);
+      Serial.println(isSuccessful);
+      isSuccessful = 0;
       sendHigh = true;
     }
     ctrlPrevTime = millis();
@@ -114,43 +96,30 @@ void loop()
     /* CODE SHOULD GO IN HERE*/
 
     // left wheels (motor 0 and motor 2)
-    angPos0 = epmcV2.readPos(0);
-    angVel0 = epmcV2.readVel(0);
-
-    angPos2 = epmcV2.readPos(2);
-    angVel2 = epmcV2.readVel(2);
-
     // left wheels (motor 1 and motor 3)
-    angPos1 = epmcV2.readPos(1);
-    angVel1 = epmcV2.readVel(1);
+    // epmcV2.readPos(pos0, pos1, pos2, pos3);
+    // epmcV2.readVel(v0, v1, v2, v3);
 
-    angPos3 = epmcV2.readPos(3);
-    angVel3 = epmcV2.readVel(3);
+    epmcV2.readMotorData(pos0, pos1, pos2, pos3, v0, v1, v2, v3);
 
     // Print results
     Serial.println("-----------------------------------");
     Serial.println("left wheels (motor 0 and motor 2)");
     Serial.print("Motor 0: ");
-    Serial.print(angPos0); Serial.print("\t");
-    Serial.println(angVel0, 4);
-
+    Serial.print(pos0); Serial.print("\t"); Serial.println(v0, 4);
     Serial.print("Motor 2: ");
-    Serial.print(angPos2); Serial.print("\t");
-    Serial.println(angVel2, 4);
+    Serial.print(pos2); Serial.print("\t"); Serial.println(v2, 4);
 
     Serial.println();
 
     Serial.println("right wheels (motor 1 and motor 3)");
     Serial.print("Motor 1: ");
-    Serial.print(angPos1); Serial.print("\t");
-    Serial.println(angVel1, 4);
-
+    Serial.print(pos1); Serial.print("\t"); Serial.println(v1, 4);
     Serial.print("Motor 3: ");
-    Serial.print(angPos3); Serial.print("\t");
-    Serial.println(angVel3, 4);
+    Serial.print(pos3); Serial.print("\t"); Serial.println(v3, 4);
     Serial.println("------------------------------------");
     
-    Serial.println();
+    // Serial.println();
 
     prevTime = millis();
   }
