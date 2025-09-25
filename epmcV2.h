@@ -18,6 +18,7 @@ public:
   int getCmdTimeout();
   int setPidMode(int motor_no, int mode);
   int getPidMode(int motor_no);
+  int clearDataBuffer();
   void readMotorData(float &pos0, float &pos1, float &pos2, float &pos3, float &v0, float &v1, float &v2, float &v3);
 
 
@@ -44,6 +45,7 @@ private:
   const uint8_t SET_CMD_TIMEOUT = 0x17;
   const uint8_t GET_CMD_TIMEOUT = 0x18;
   const uint8_t READ_MOTOR_DATA = 0x2A;
+  const uint8_t CLEAR_DATA_BUFFER = 0x2B;
   //---------------------------------------------
 };
 

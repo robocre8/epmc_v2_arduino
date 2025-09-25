@@ -48,8 +48,9 @@ void setup()
   // setup serial communication to print result on serial minitor
   Serial.begin(115200);
 
-  delay(4000);
+  delay(2000);
 
+  epmcV2.clearDataBuffer();
   // left wheels (motor 0 and motor 2)
   // right wheels (motor 1 and motor 3)
   epmcV2.writeSpeed(0.0, 0.0, 0.0, 0.0);

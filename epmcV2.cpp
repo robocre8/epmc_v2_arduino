@@ -214,3 +214,10 @@ int EPMC_V2::getPidMode(int motor_no){
   res = read_data1();
   return (int)res;
 }
+int EPMC_V2::clearDataBuffer(){
+  float res;
+  write_data1(CLEAR_DATA_BUFFER, 0, 0.0);
+  res = read_data1();
+  res = read_data1();
+  return (int)res;
+}
