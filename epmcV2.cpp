@@ -157,19 +157,13 @@ void EPMC_V2::readMotorData(float &pos0, float &pos1, float &pos2, float &pos3, 
 }
 
 
-int EPMC_V2::writeSpeed(float v0, float v1, float v2, float v3){
+void EPMC_V2::writeSpeed(float v0, float v1, float v2, float v3){
   float res;
   write_data4(WRITE_VEL, v0, v1, v2, v3);
-  res = read_data1();
-  res = read_data1();
-  return (int)res;
 }
-int EPMC_V2::writePWM(int pwm0, int pwm1, int pwm2, int pwm3){
+void EPMC_V2::writePWM(int pwm0, int pwm1, int pwm2, int pwm3){
   float res;
   write_data4(WRITE_VEL, (float)pwm0, (float)pwm1, (float)pwm2, (float)pwm3);
-  res = read_data1();
-  res = read_data1();
-  return (int)res;
 }
 void EPMC_V2::readPos(float &pos0, float &pos1, float &pos2, float &pos3){
   send_packet_without_payload(READ_POS);

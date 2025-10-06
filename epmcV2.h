@@ -9,8 +9,8 @@ class EPMC_V2
 public:
   EPMC_V2(int);
 
-  int writeSpeed(float v0, float v1, float v2, float v3);
-  int writePWM(int pwm0, int pwm1, int pwm2, int pwm3);
+  void writeSpeed(float v0, float v1, float v2, float v3);
+  void writePWM(int pwm0, int pwm1, int pwm2, int pwm3);
   void readPos(float &pos0, float &pos1, float &pos2, float &pos3);
   void readVel(float &v0, float &v1, float &v2, float &v3);
   void readUVel(float &v0, float &v1, float &v2, float &v3);

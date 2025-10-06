@@ -26,7 +26,6 @@ void delayMs(int ms)
 }
 //////////////////////////////////////////////////
 
-int isSuccessful;
 float pos0, pos1, pos2, pos3; // (in rad)
 float v0, v1, v2, v3; // (in rad/sec)
 
@@ -75,18 +74,14 @@ void loop()
     {
       // left wheels (motor 0 and motor 2)
       // right wheels (motor 1 and motor 3)
-      isSuccessful = epmcV2.writeSpeed(highTargetVel, highTargetVel, highTargetVel, highTargetVel);
-      Serial.println(isSuccessful);
-      isSuccessful = 0;
+      epmcV2.writeSpeed(highTargetVel, highTargetVel, highTargetVel, highTargetVel);
       sendHigh = false;
     }
     else
     {
       // left wheels (motor 0 and motor 2)
       // right wheels (motor 1 and motor 3)
-      isSuccessful = epmcV2.writeSpeed(lowTargetVel, lowTargetVel, lowTargetVel, lowTargetVel);
-      Serial.println(isSuccessful);
-      isSuccessful = 0;
+      epmcV2.writeSpeed(lowTargetVel, lowTargetVel, lowTargetVel, lowTargetVel);
       sendHigh = true;
     }
     ctrlPrevTime = millis();
