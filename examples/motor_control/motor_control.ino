@@ -26,8 +26,8 @@ void delayMs(int ms)
 }
 //////////////////////////////////////////////////
 
-float pos0, pos1; // (in rad)
-float v0, v1; // (in rad/sec)
+float pos0, pos1, pos2, pos3; // (in rad)
+float v0, v1, v2, v3; // (in rad/sec)
 
 float lowTargetVel = 0.00;  // rad/sec
 float highTargetVel = 5.00; // rad/sec
@@ -37,7 +37,7 @@ long prevTime;
 long sampleTime = 15; // millisec
 
 long ctrlPrevTime;
-long ctrlSampleTime = 5000; // millisec
+long ctrlSampleTime = 2500; // millisec
 
 void setup()
 {
@@ -50,7 +50,7 @@ void setup()
   delay(3000);
 
   epmcV2.clearDataBuffer();
-  epmcV2.writeSpeed(0.0, 0.0);
+  epmcV2.writeSpeed(0.0, 0.0, 0.0, 0.0);
 
   int cmd_vel_timeout = 10000; // 0 to deactivate.
   epmcV2.setCmdTimeout(cmd_vel_timeout); // set motor command velocity timeout
@@ -70,13 +70,13 @@ void loop()
   {
     if (sendHigh)
     {
-      epmcV2.writeSpeed(highTargetVel, highTargetVel);
+      epmcV2.writeSpeed(highTargetVel, highTargetVel, highTargetVel, highTargetVel);
       highTargetVel *= -1;
       sendHigh = false;
     }
     else
     {
-      epmcV2.writeSpeed(lowTargetVel, lowTargetVel);
+      epmcV2.writeSpeed(lowTargetVel, lowTargetVel, lowTargetVel, lowTargetVel);
       sendHigh = true;
     }
     ctrlPrevTime = millis();
@@ -85,7 +85,7 @@ void loop()
   if ((millis() - prevTime) >= sampleTime)
   {
     /* CODE SHOULD GO IN HERE*/
-    epmcV2.readMotorData(pos0, pos1, v0, v1);
+    epmcV2.readMotorData(pos0, pos1, pos2, pos3, v0, v1, v2, v3);
 
     // Print results
     Serial.println("-----------------------------------");
@@ -93,6 +93,10 @@ void loop()
     Serial.print(pos0, 2); Serial.print("\t"); Serial.println(v0, 4);
     Serial.print("Motor 1: ");
     Serial.print(pos1, 2); Serial.print("\t"); Serial.println(v1, 4);
+    Serial.print("Motor 2: ");
+    Serial.print(pos2, 2); Serial.print("\t"); Serial.println(v2, 4);
+    Serial.print("Motor 3: ");
+    Serial.print(pos3, 2); Serial.print("\t"); Serial.println(v3, 4);
     Serial.println("------------------------------------");
     
     // Serial.println();

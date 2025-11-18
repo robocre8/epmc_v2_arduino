@@ -9,27 +9,27 @@ class EPMC_V2
 public:
   EPMC_V2(int);
 
-  void writeSpeed(float v0, float v1);
-  void writePWM(int pwm0, int pwm1);
-  void readPos(float &pos0, float &pos1);
-  void readVel(float &v0, float &v1);
-  void readUVel(float &v0, float &v1);
+  void writeSpeed(float v0, float v1, float v2, float v3);
+  void writePWM(int pwm0, int pwm1, int pwm2, int pwm3);
+  void readPos(float &pos0, float &pos1, float &pos2, float &pos3);
+  void readVel(float &v0, float &v1, float &v2, float &v3);
+  void readUVel(float &v0, float &v1, float &v2, float &v3);
   bool setCmdTimeout(int timeout_ms);
   int getCmdTimeout();
   bool setPidMode(int mode);
   int getPidMode();
   bool clearDataBuffer();
-  void readMotorData(float &pos0, float &pos1, float &v0, float &v1);
+  void readMotorData(float &pos0, float &pos1, float &pos2, float &pos3, float &v0, float &v1, float &v2, float &v3);
 
 
 private:
   int slaveAddr;
   void send_packet_without_payload(uint8_t cmd);
   void write_data1(uint8_t cmd, uint8_t pos, float val);
-  void write_data2(uint8_t cmd, float val0, float val1);
+  void write_data4(uint8_t cmd, float val0, float val1, float val2, float val3);
   void read_data1(float &val0);
-  void read_data2(float &val0, float &val1);
   void read_data4(float &val0, float &val1, float &val2, float &val3);
+  void read_data8(float &val0, float &val1, float &val2, float &val3, float &val4, float &val5, float &val6, float &val7);
 
   //  Protocol Command IDs -------------
   const uint8_t START_BYTE = 0xAA;
